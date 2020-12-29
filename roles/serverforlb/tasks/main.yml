@@ -1,0 +1,35 @@
+---
+# tasks file for serverforlb
+- name: "mounting cdrom to directory"
+  mount:
+    path: "/data"
+    src: "/dev/sr0"
+    fstype: iso9660
+    opts: ro,noauto
+    state: mounted
+- name: "yum repository for appstream"
+  yum_repository:
+    name: "appstream"
+    description: "contains appstream softwares"
+    baseurl: "file:///data/AppStream"
+    enabled: yes
+    gpgcheck: no 
+- name: "yum repository for baseos"
+  yum_repository:
+    name: "baseos"
+    description: "contains baseos softwares"
+    baseurl: "file:///data/BaseOS"
+    enabled: yes
+    gpgcheck: no
+- name: install httpd
+  package:
+    name: "httpd"
+    state: present
+- name: creating webpage
+  copy:
+    content: "This Is  {{ ansible_default_ipv4.address }}"
+    dest: /var/www/html/index.html
+- name: starting httpd service
+  service:
+    name: "httpd"
+    state: started

@@ -1,0 +1,35 @@
+---
+# tasks file for loadbalancer
+- name: "mounting cdrom to directory"
+  mount:
+    path: "/data"
+    src: "/dev/sr0"
+    fstype: iso9660
+    opts: ro,noauto
+    state: mounted
+- name: "yum repository for appstream"
+  yum_repository:
+    name: "appstream"
+    description: "contains appstream softwares"
+    baseurl: "file:///data/AppStream"
+    enabled: yes
+    gpgcheck: no 
+- name: "yum repository for baseos"
+  yum_repository:
+    name: "baseos"
+    description: "contains baseos softwares"
+    baseurl: "file:///data/BaseOS"
+    enabled: yes
+    gpgcheck: no
+- name: installing haproxy
+  package: 
+    name: "haproxy"
+    state: present
+- name: copying config file
+  template:
+    src: "haproxy.cfg"
+    dest: "/etc/haproxy/haproxy.cfg"
+- name: start haproxy service
+  service:
+    name: "haproxy"
+    state: started
